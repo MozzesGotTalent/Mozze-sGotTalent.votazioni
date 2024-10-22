@@ -7,6 +7,10 @@ body {
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     color: #333;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Background animation */
@@ -43,6 +47,17 @@ h1, h2 {
     font-size: 2rem;
 }
 
+/* Responsive typography */
+@media (max-width: 768px) {
+    h1, h2 {
+        font-size: 1.5rem;
+    }
+    .container {
+        padding: 20px;
+    }
+}
+
+/* Partecipanti */
 .partecipante {
     display: flex;
     justify-content: space-between;
@@ -79,9 +94,15 @@ button:hover {
 
 form {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 30px;
+}
+
+@media (min-width: 768px) {
+    form {
+        flex-direction: row;
+    }
 }
 
 input {
@@ -158,4 +179,33 @@ li:hover {
     background-color: #27ae60;
     transform: scale(1.05);
     box-shadow: 0 5px 15px rgba(0, 128, 0, 0.4);
+}
+
+/* Responsive media queries */
+@media (max-width: 768px) {
+    .container {
+        max-width: 95%;
+    }
+    .partecipante {
+        flex-direction: column;
+        gap: 10px;
+    }
+    button {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1, h2 {
+        font-size: 1.2rem;
+    }
+    .partecipante {
+        padding: 10px;
+    }
+    button {
+        padding: 10px;
+        font-size: 1rem;
+    }
 }

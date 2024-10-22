@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votazioni Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-storage-compat.js"></script>
+
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Panel</h2>
+        <form id="addPartecipanteForm">
+            <input type="text" id="nome" placeholder="Nome del partecipante" required><br>
+            <input type="file" id="foto" accept="image/*" required> <!-- Campo per la foto -->
+            <button type="submit">Aggiungi Partecipante</button>
+        </form>
+        <ul id="adminPartecipantiList"></ul>
+        <h3 id="statoVotazioni"></h3>
+        <button id="toggleVotazioni">Toggle Votazioni</button>
+        <p id="messaggioVotazioni"></p>
+    </div>
+</body>
+</html>

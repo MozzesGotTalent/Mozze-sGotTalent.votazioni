@@ -76,18 +76,24 @@ document.addEventListener("DOMContentLoaded", function () {
               const div = document.createElement("div");
               div.className = "partecipante";
               div.innerHTML = `
-                  <img src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
-                  <span>${partecipante.nome}</span>
-                  <button class="votaBtn" data-id="${id}">Vota</button>
-                `;
+                            <img src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
+                            <span>${partecipante.nome}</span>
+                            <button class="votaBtn" data-id="${id}">Vota</button>
+                        `;
               partecipantiList.appendChild(div);
             }
 
-            // Add event listeners for voting buttons
+            // Aggiungi event listeners per i pulsanti di voto
             document.querySelectorAll(".votaBtn").forEach((button) => {
               button.addEventListener("click", votaPartecipante);
+
+              // Disabilita il pulsante se l'utente ha già votato
+              if (localStorage.getItem("votato")) {
+                button.classList.add("già-votato");
+                button.disabled = true; // Disabilita il pulsante
+              }
             });
-        }
+          }
         });
       }
     });
@@ -95,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   addPartecipanteForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    
+
     const nome = document.getElementById("nome").value;
     const immagineFile = document.getElementById("foto").files[0]; // Ottieni il file immagine
 
@@ -105,22 +111,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const nuovoPartecipanteRef = db.ref("partecipanti").push();
-    const immagineRef = storage.ref(`immaginiPartecipanti/${nuovoPartecipanteRef.key}-${immagineFile.name}`);
+    const immagineRef = storage.ref(
+      `immaginiPartecipanti/${nuovoPartecipanteRef.key}-${immagineFile.name}`
+    );
 
     // Carica l'immagine su Firebase Storage
-    immagineRef.put(immagineFile).then((snapshot) => {
-      snapshot.ref.getDownloadURL().then((url) => {
-        // Salva il partecipante con l'URL dell'immagine nel database
-        nuovoPartecipanteRef.set({
-          nome: nome,
-          voti: 0,
-          immagineUrl: url, // Salva l'URL dell'immagine
+    immagineRef
+      .put(immagineFile)
+      .then((snapshot) => {
+        snapshot.ref.getDownloadURL().then((url) => {
+          // Salva il partecipante con l'URL dell'immagine nel database
+          nuovoPartecipanteRef.set({
+            nome: nome,
+            voti: 0,
+            immagineUrl: url, // Salva l'URL dell'immagine
+          });
+          addPartecipanteForm.reset();
         });
-        addPartecipanteForm.reset();
+      })
+      .catch((error) => {
+        console.error("Errore durante il caricamento dell'immagine:", error);
       });
-    }).catch((error) => {
-      console.error("Errore durante il caricamento dell'immagine:", error);
-    });
   });
 
   // Toggle voting state
@@ -136,10 +147,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to vote for a participant (limited to one vote per user)
   function votaPartecipante(e) {
     const id = e.target.getAttribute("data-id");
+    const button = e.target;
 
     // Check if user has already voted
     if (localStorage.getItem("votato")) {
       alert("Hai già votato.");
+      button.classList.add("già-votato"); // Aggiungi classe per indicare già votato
+      button.disabled = true; // Disabilita il pulsante
       return;
     }
 
@@ -155,7 +169,9 @@ document.addEventListener("DOMContentLoaded", function () {
         partecipanteRef.once("value").then((snapshot) => {
           const partecipante = snapshot.val();
           partecipanteRef.update({ voti: partecipante.voti + 1 });
-          localStorage.setItem("votato", id); // Set flag to prevent multiple votes
+          localStorage.setItem("votato", id); // Imposta il flag per impedire più voti
+          button.classList.add("già-votato"); // Aggiungi classe per indicare già votato
+          button.disabled = true; // Disabilita il pulsante
         });
       });
   }
@@ -163,49 +179,116 @@ document.addEventListener("DOMContentLoaded", function () {
   // Carica i partecipanti nell'admin e permette la rimozione
   db.ref("partecipanti").on("value", (snapshot) => {
     const partecipanti = snapshot.val();
-    const adminPartecipantiList = document.getElementById(
-      "adminPartecipantiList"
-    );
+    const adminPartecipantiList = document.getElementById("adminPartecipantiList");
 
     if (!adminPartecipantiList) {
-      console.error("Elemento adminPartecipantiList non trovato!");
-      return;
+        console.error("Elemento adminPartecipantiList non trovato!");
+        return;
     }
 
     adminPartecipantiList.innerHTML = "";
 
     const partecipantiArray = [];
     for (let id in partecipanti) {
-      partecipantiArray.push({
-        id: id,
-        nome: partecipanti[id].nome,
-        voti: partecipanti[id].voti,
-      });
+        partecipantiArray.push({
+            id: id,
+            nome: partecipanti[id].nome,
+            voti: partecipanti[id].voti,
+            immagineUrl: partecipanti[id].immagineUrl // Assicurati di avere anche l'URL dell'immagine
+        });
     }
 
     // Ordina i partecipanti in ordine crescente di voti
     partecipantiArray.sort((a, b) => a.voti - b.voti);
 
     partecipantiArray.forEach((partecipante) => {
-      const li = document.createElement("li");
-      li.style.transition = "all 0.5s ease"; // Animazione di transizione
-      li.innerHTML = `
-          ${partecipante.nome} - Voti: ${partecipante.voti}
-          <button class="rimuoviBtn" data-id="${partecipante.id}">Rimuovi</button>
+        const li = document.createElement("li");
+        li.style.transition = "all 0.5s ease"; // Animazione di transizione
+        li.innerHTML = `
+            <img src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
+            ${partecipante.nome} - Voti: ${partecipante.voti}
+            <button class="rimuoviBtn" data-id="${partecipante.id}">Rimuovi</button>
         `;
-      adminPartecipantiList.appendChild(li);
+        adminPartecipantiList.appendChild(li);
     });
 
     // Aggiungi listener per la rimozione dei partecipanti
     document.querySelectorAll(".rimuoviBtn").forEach((button) => {
-      button.addEventListener("click", rimuoviPartecipante);
+        button.addEventListener("click", rimuoviPartecipante);
     });
-  });
+});
 
   // Funzione per rimuovere un partecipante
   function rimuoviPartecipante(e) {
     const id = e.target.getAttribute("data-id");
     const partecipanteRef = db.ref(`partecipanti/${id}`);
-    partecipanteRef.remove(); // Rimuove il partecipante dal database
+    partecipanteRef.remove() // Rimuove il partecipante dal database
+        .then(() => {
+            console.log(`Partecipante ${id} rimosso con successo.`);
+        })
+        .catch((error) => {
+            console.error("Errore durante la rimozione del partecipante:", error);
+        });
+}
+  // Funzione per ottenere i voti e creare la classifica
+  // Funzione per ottenere i voti e creare la classifica con animazione stile Eurovision
+  // Funzione per ottenere i voti e creare la classifica con animazione stile Eurovision
+  function mostraClassifica() {
+    firebase
+      .database()
+      .ref("partecipanti")
+      .once("value", (snapshot) => {
+        const partecipanti = [];
+        snapshot.forEach((childSnapshot) => {
+          const partecipante = childSnapshot.val();
+          partecipanti.push({
+            nome: partecipante.nome,
+            voti: partecipante.voti || 0,
+            foto: partecipante.foto || "Screenshot 2024-10-22 at 22.17.44.jpg", // Assicurati di avere una foto per ogni partecipante
+          });
+        });
+
+        // Ordina i partecipanti in base ai voti
+        partecipanti.sort((a, b) => b.voti - a.voti);
+
+        // Crea la pagina della classifica con animazione
+        let classificaHtml = `
+      <h1>Classifica Finale</h1>
+      <div class="classifica-container">
+          <ul>`;
+
+        for (let id in partecipanti) {
+          const p = partecipanti[id];
+          classificaHtml += `
+            <li class="partecipante">
+                <img src="${p.foto}" alt="${p.nome}" class="foto-partecipante">
+                <div class="dettagli-partecipante">
+                    <strong>${p.nome}</strong>
+                    <span>${p.voti} voti</span>
+                </div>
+            </li>`;
+        }
+        classificaHtml += "</ul></div>";
+        console.log(classificaHtml);
+        // Mostra la classifica nella nuova pagina
+        const classificaPage = window.open("", "_blank");
+        classificaPage.document.write(`
+          <!DOCTYPE html>
+          <html lang="it">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Classifica Finale</title>
+              <link rel="stylesheet" href="styleClassifica.css">
+          </head>
+          <body>${classificaHtml}</body>
+          </html>
+      `);
+      });
   }
+
+  // Evento per il bottone della classifica
+  document
+    .getElementById("showRanking")
+    .addEventListener("click", mostraClassifica);
 });

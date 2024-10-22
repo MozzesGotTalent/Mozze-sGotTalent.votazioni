@@ -209,3 +209,10 @@ li:hover {
         font-size: 1rem;
     }
 }
+
+.già-votato {
+    background-color: gray; /* Colore di sfondo grigio */
+    cursor: not-allowed; /* Cambia il cursore */
+    text-decoration: line-through; /* Aggiunge una linea sopra il testo */
+    opacity: 0.6; /* Riduce l'opacità */
+}

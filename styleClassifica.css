@@ -1,0 +1,86 @@
+/* Sfondo animato */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #141e30, #243b55, #415a77);
+    background-size: 200% 200%;
+    animation: bgAnimation 15s ease infinite;
+    color: #fff;
+}
+
+/* Animazione sfondo */
+@keyframes bgAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Contenitore classifica */
+.classifica-container {
+    max-width: 900px;
+    margin: 50px auto;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Foto partecipante con effetto di animazione */
+.partecipante {
+    margin: 20px 0;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-100%);
+    animation: slideIn 1.5s ease forwards;
+}
+
+.partecipante:nth-child(even) {
+    animation-delay: 0.5s;
+}
+
+.partecipante:nth-child(odd) {
+    animation-delay: 1s;
+}
+
+/* Animazione slide-in */
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Stile foto dei partecipanti */
+.foto-partecipante {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+    border: 3px solid #fff;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.foto-partecipante:hover {
+    transform: scale(1.1);
+}
+
+/* Nome partecipante e voti */
+.dettagli-partecipante {
+    font-size: 1.5rem;
+    text-align: left;
+}
+
+.dettagli-partecipante span {
+    display: block;
+    font-size: 1.2rem;
+    color: #f9c74f;
+}

@@ -149,33 +149,41 @@ document.addEventListener("DOMContentLoaded", function () {
     const id = e.target.getAttribute("data-id");
     const button = e.target;
 
+    // Disabilita il pulsante di voto immediatamente
+    button.classList.add("già-votato"); // Aggiungi classe per indicare già votato
+    button.disabled = true; // Disabilita il pulsante
+
     // Check if user has already voted
     if (localStorage.getItem("votato")) {
-      alert("Hai già votato.");
-      button.classList.add("già-votato"); // Aggiungi classe per indicare già votato
-      button.disabled = true; // Disabilita il pulsante
-      return;
+        alert("Hai già votato.");
+        return;
     }
 
+    // Aggiungi il voto al partecipante
     db.ref("statoVotazioni")
-      .once("value")
-      .then((snapshot) => {
-        const stato = snapshot.val();
-        if (!stato) {
-          alert("Le votazioni sono chiuse.");
-          return;
-        }
-        const partecipanteRef = db.ref(`partecipanti/${id}`);
-        partecipanteRef.once("value").then((snapshot) => {
-          const partecipante = snapshot.val();
-          partecipanteRef.update({ voti: partecipante.voti + 1 });
-          localStorage.setItem("votato", id); // Imposta il flag per impedire più voti
-          button.classList.add("già-votato"); // Aggiungi classe per indicare già votato
-          button.disabled = true; // Disabilita il pulsante
-        });
-      });
-  }
+        .once("value")
+        .then((snapshot) => {
+            const stato = snapshot.val();
+            if (!stato) {
+                alert("Le votazioni sono chiuse.");
+                return;
+            }
+            const partecipanteRef = db.ref(`partecipanti/${id}`);
+            partecipanteRef.once("value").then((snapshot) => {
+                const partecipante = snapshot.val();
+                partecipanteRef.update({ voti: partecipante.voti + 1 });
+                localStorage.setItem("votato", id); // Imposta il flag per impedire più voti
 
+                // Disabilita tutti i pulsanti di voto
+                document.querySelectorAll(".votaBtn").forEach((btn) => {
+                    btn.disabled = true;
+                });
+
+                // Ricarica la pagina dopo il voto
+                location.reload();
+            });
+        });
+}
   // Carica i partecipanti nell'admin e permette la rimozione
   db.ref("partecipanti").on("value", (snapshot) => {
     const partecipanti = snapshot.val();

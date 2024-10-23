@@ -164,7 +164,6 @@ h1, h2 {
     position: absolute; /* Cambiato da relative ad absolute */
     left: 50%; /* Centra il bottone orizzontalmente rispetto al partecipante */
     bottom: -20px; /* Lo posiziona fuori dal box, sotto il partecipante */
-    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
     margin-top: 0; /* Rimuove il margine superiore */
     padding: 10px 20px;
     background-color: green;
@@ -179,10 +178,6 @@ h1, h2 {
     display: flex;
     justify-content: center; /* Assicura che il testo sia centrato orizzontalmente */
     align-items: center; /* Assicura che il testo sia centrato verticalmente */
-}
-
-.votaBtn:checked {
-    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
 }
 
 /* Hover generico sui bottoni */

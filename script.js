@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Load participants
+  // Load participants
   if (partecipantiList) {
     db.ref("statoVotazioni").on("value", (snapshot) => {
       const stato = snapshot.val();
@@ -68,20 +69,43 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         messaggioVotazioni.textContent = "";
         db.ref("partecipanti").on("value", (snapshot) => {
-          const partecipanti = snapshot.val();
+          let partecipanti = snapshot.val();
           partecipantiList.innerHTML = "";
+
           if (partecipanti) {
-            for (let id in partecipanti) {
-              const partecipante = partecipanti[id];
+            // Converti l'oggetto dei partecipanti in un array
+            partecipanti = Object.entries(partecipanti).map(
+              ([id, partecipante]) => ({
+                id, // Mantieni l'id
+                ...partecipante, // Espandi l'oggetto partecipante
+              })
+            );
+
+            // Ordina i partecipanti per numero della performance
+            partecipanti.sort(
+              (a, b) => a.performanceNumber - b.performanceNumber
+            );
+
+            // Aggiungi i partecipanti al DOM
+            partecipanti.forEach((partecipante) => {
+              const numeroEsibizione = partecipante.performanceNumber
+                .toString()
+                .padStart(2, "0"); // Aggiungi lo zero se il numero è a una cifra
               const div = document.createElement("div");
               div.className = "partecipante";
               div.innerHTML = `
-                            <img src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
-                            <span>${partecipante.nome}</span>
-                            <button class="votaBtn" data-id="${id}">Vota</button>
-                        `;
+              <img class="immagine" src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
+              <div class="number-wrapper">
+              <div class="number">${numeroEsibizione}</div>
+              </div>
+              <div class="name-wrapper">
+              <div class="name">${partecipante.nome}</div>
+              </div>
+
+              <button class="votaBtn" data-id="${partecipante.id}">Vota</button>
+            `;
               partecipantiList.appendChild(div);
-            }
+            });
 
             // Aggiungi event listeners per i pulsanti di voto
             document.querySelectorAll(".votaBtn").forEach((button) => {
@@ -104,34 +128,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const nome = document.getElementById("nome").value;
     const immagineFile = document.getElementById("foto").files[0]; // Ottieni il file immagine
-
-    if (!immagineFile) {
-      alert("Seleziona un'immagine per il partecipante.");
-      return;
-    }
+    const performanceNumber =
+      document.getElementById("performanceNumber").value;
 
     const nuovoPartecipanteRef = db.ref("partecipanti").push();
-    const immagineRef = storage.ref(
-      `immaginiPartecipanti/${nuovoPartecipanteRef.key}-${immagineFile.name}`
-    );
 
-    // Carica l'immagine su Firebase Storage
-    immagineRef
-      .put(immagineFile)
-      .then((snapshot) => {
-        snapshot.ref.getDownloadURL().then((url) => {
-          // Salva il partecipante con l'URL dell'immagine nel database
-          nuovoPartecipanteRef.set({
-            nome: nome,
-            voti: 0,
-            immagineUrl: url, // Salva l'URL dell'immagine
-          });
-          addPartecipanteForm.reset();
-        });
-      })
-      .catch((error) => {
-        console.error("Errore durante il caricamento dell'immagine:", error);
+    if (!immagineFile) {
+      // Se non viene caricata un'immagine, imposta l'immagine predefinita "user.jpg"
+      nuovoPartecipanteRef.set({
+        nome: nome,
+        voti: 0,
+        immagineUrl: "user.jpg", // Usa l'immagine predefinita
+        performanceNumber: performanceNumber,
       });
+      addPartecipanteForm.reset();
+    } else {
+      const immagineRef = storage.ref(
+        `immaginiPartecipanti/${nuovoPartecipanteRef.key}-${immagineFile.name}`
+      );
+
+      // Carica l'immagine su Firebase Storage
+      immagineRef
+        .put(immagineFile)
+        .then((snapshot) => {
+          snapshot.ref.getDownloadURL().then((url) => {
+            // Salva il partecipante con l'URL dell'immagine nel database
+            nuovoPartecipanteRef.set({
+              nome: nome,
+              voti: 0,
+              immagineUrl: url || "user.jpg", // Salva l'URL dell'immagine o l'immagine predefinita
+              performanceNumber: performanceNumber,
+            });
+            addPartecipanteForm.reset();
+          });
+        })
+        .catch((error) => {
+          console.error("Errore durante il caricamento dell'immagine:", error);
+        });
+    }
   });
 
   // Toggle voting state
@@ -155,91 +189,94 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check if user has already voted
     if (localStorage.getItem("votato")) {
-        alert("Hai già votato.");
-        return;
+      alert("Hai già votato.");
+      return;
     }
 
     // Aggiungi il voto al partecipante
     db.ref("statoVotazioni")
-        .once("value")
-        .then((snapshot) => {
-            const stato = snapshot.val();
-            if (!stato) {
-                alert("Le votazioni sono chiuse.");
-                return;
-            }
-            const partecipanteRef = db.ref(`partecipanti/${id}`);
-            partecipanteRef.once("value").then((snapshot) => {
-                const partecipante = snapshot.val();
-                partecipanteRef.update({ voti: partecipante.voti + 1 });
-                localStorage.setItem("votato", id); // Imposta il flag per impedire più voti
+      .once("value")
+      .then((snapshot) => {
+        const stato = snapshot.val();
+        if (!stato) {
+          alert("Le votazioni sono chiuse.");
+          return;
+        }
+        const partecipanteRef = db.ref(`partecipanti/${id}`);
+        partecipanteRef.once("value").then((snapshot) => {
+          const partecipante = snapshot.val();
+          partecipanteRef.update({ voti: partecipante.voti + 1 });
+          localStorage.setItem("votato", id); // Imposta il flag per impedire più voti
 
-                // Disabilita tutti i pulsanti di voto
-                document.querySelectorAll(".votaBtn").forEach((btn) => {
-                    btn.disabled = true;
-                });
+          // Disabilita tutti i pulsanti di voto
+          document.querySelectorAll(".votaBtn").forEach((btn) => {
+            btn.disabled = true;
+          });
 
-                // Ricarica la pagina dopo il voto
-                location.reload();
-            });
+          // Ricarica la pagina dopo il voto
+          location.reload();
         });
-}
+      });
+  }
   // Carica i partecipanti nell'admin e permette la rimozione
   db.ref("partecipanti").on("value", (snapshot) => {
     const partecipanti = snapshot.val();
-    const adminPartecipantiList = document.getElementById("adminPartecipantiList");
+    const adminPartecipantiList = document.getElementById(
+      "adminPartecipantiList"
+    );
 
     if (!adminPartecipantiList) {
-        console.error("Elemento adminPartecipantiList non trovato!");
-        return;
+      console.error("Elemento adminPartecipantiList non trovato!");
+      return;
     }
 
     adminPartecipantiList.innerHTML = "";
 
     const partecipantiArray = [];
     for (let id in partecipanti) {
-        partecipantiArray.push({
-            id: id,
-            nome: partecipanti[id].nome,
-            voti: partecipanti[id].voti,
-            immagineUrl: partecipanti[id].immagineUrl // Assicurati di avere anche l'URL dell'immagine
-        });
+      partecipantiArray.push({
+        id: id,
+        nome: partecipanti[id].nome,
+        voti: partecipanti[id].voti,
+        immagineUrl: partecipanti[id].immagineUrl || "user.jpg", // Assicurati di avere anche l'URL dell'immagine
+        performanceNumber: partecipanti[id].performanceNumber,
+      });
     }
 
     // Ordina i partecipanti in ordine crescente di voti
     partecipantiArray.sort((a, b) => a.voti - b.voti);
 
     partecipantiArray.forEach((partecipante) => {
-        const li = document.createElement("li");
-        li.style.transition = "all 0.5s ease"; // Animazione di transizione
-        li.innerHTML = `
+      const li = document.createElement("li");
+      li.style.transition = "all 0.5s ease"; // Animazione di transizione
+      li.innerHTML = `
             <img src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
-            ${partecipante.nome} - Voti: ${partecipante.voti}
+            ${partecipante.nome} - Voti: ${partecipante.voti} - Esibizione N°: ${partecipante.performanceNumber}
             <button class="rimuoviBtn" data-id="${partecipante.id}">Rimuovi</button>
         `;
-        adminPartecipantiList.appendChild(li);
+      adminPartecipantiList.appendChild(li);
     });
 
     // Aggiungi listener per la rimozione dei partecipanti
     document.querySelectorAll(".rimuoviBtn").forEach((button) => {
-        button.addEventListener("click", rimuoviPartecipante);
+      button.addEventListener("click", rimuoviPartecipante);
     });
-});
+  });
 
   // Funzione per rimuovere un partecipante
   function rimuoviPartecipante(e) {
     const id = e.target.getAttribute("data-id");
     const partecipanteRef = db.ref(`partecipanti/${id}`);
-    partecipanteRef.remove() // Rimuove il partecipante dal database
-        .then(() => {
-            console.log(`Partecipante ${id} rimosso con successo.`);
-        })
-        .catch((error) => {
-            console.error("Errore durante la rimozione del partecipante:", error);
-        });
-}
-  // Funzione per ottenere i voti e creare la classifica
-  // Funzione per ottenere i voti e creare la classifica con animazione stile Eurovision
+    partecipanteRef
+      .remove() // Rimuove il partecipante dal database
+      .then(() => {
+        console.log(`Partecipante ${id} rimosso con successo.`);
+      })
+      .catch((error) => {
+        console.error("Errore durante la rimozione del partecipante:", error);
+      });
+  }
+
   // Funzione per ottenere i voti e creare la classifica con animazione stile Eurovision
   function mostraClassifica() {
     firebase
@@ -249,35 +286,35 @@ document.addEventListener("DOMContentLoaded", function () {
         const partecipanti = [];
         snapshot.forEach((childSnapshot) => {
           const partecipante = childSnapshot.val();
+          console.log(`Foto URL: ${partecipante.immagineUrl}`);
           partecipanti.push({
             nome: partecipante.nome,
             voti: partecipante.voti || 0,
-            foto: partecipante.foto || "Screenshot 2024-10-22 at 22.17.44.jpg", // Assicurati di avere una foto per ogni partecipante
+            foto: partecipante.immagineUrl || "user.jpg",
           });
         });
 
-        // Ordina i partecipanti in base ai voti
-        partecipanti.sort((a, b) => b.voti - a.voti);
+        // Ordina i partecipanti in base ai voti (dal meno al più votato)
+        partecipanti.sort((a, b) => a.voti - b.voti);
 
-        // Crea la pagina della classifica con animazione
+        // Crea la pagina della classifica senza mostrarla ancora
         let classificaHtml = `
-      <h1>Classifica Finale</h1>
-      <div class="classifica-container">
-          <ul>`;
+          <h1>Classifica Finale</h1>
+          <div class="classifica-container">
+              <ul>`;
 
-        for (let id in partecipanti) {
-          const p = partecipanti[id];
+        partecipanti.forEach((partecipante) => {
           classificaHtml += `
-            <li class="partecipante">
-                <img src="${p.foto}" alt="${p.nome}" class="foto-partecipante">
+            <li class="partecipante" style="display: none;"> <!-- Inizialmente invisibile -->
+                <img src="${partecipante.foto}" alt="${partecipante.nome}" class="foto-partecipante">
                 <div class="dettagli-partecipante">
-                    <strong>${p.nome}</strong>
-                    <span>${p.voti} voti</span>
+                    <strong>${partecipante.nome}</strong>
+                    <span>${partecipante.voti} voti</span>
                 </div>
             </li>`;
-        }
+        });
         classificaHtml += "</ul></div>";
-        console.log(classificaHtml);
+
         // Mostra la classifica nella nuova pagina
         const classificaPage = window.open("", "_blank");
         classificaPage.document.write(`
@@ -288,13 +325,46 @@ document.addEventListener("DOMContentLoaded", function () {
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Classifica Finale</title>
               <link rel="stylesheet" href="styleClassifica.css">
+              <style>
+                  .partecipante {
+                      transition: opacity 0.5s ease; /* Transizione per l'animazione */
+                  }
+              </style>
           </head>
           <body>${classificaHtml}</body>
           </html>
-      `);
+        `);
+
+        // Inizializza l'indice del partecipante corrente
+        let currentIndex = 0;
+
+        // Funzione per mostrare il partecipante successivo
+        function mostraProssimoPartecipante() {
+          const partecipantiList =
+            classificaPage.document.querySelectorAll(".partecipante");
+
+          // Se ci sono partecipanti da mostrare
+          if (currentIndex < partecipantiList.length) {
+            // Mostra solo il partecipante corrente
+            partecipantiList[currentIndex].style.display = "block"; // Assicurati che sia visibile
+            partecipantiList[currentIndex].style.opacity = 1; // Imposta l'opacità a 1
+
+            // Incrementa l'indice per il prossimo partecipante
+            currentIndex++;
+          }
+        }
+
+        // Aggiungi l'event listener per l'animazione
+        classificaPage.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            mostraProssimoPartecipante(); // Mostra il partecipante successivo
+          }
+        });
+
+        // Imposta il focus sulla pagina per ricevere l'input
+        classificaPage.focus();
       });
   }
-
   // Evento per il bottone della classifica
   document
     .getElementById("showRanking")

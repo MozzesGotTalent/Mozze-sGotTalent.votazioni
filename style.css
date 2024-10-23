@@ -1,16 +1,11 @@
 /* Global settings */
 body {
-    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
-    background-size: 400% 400%;
-    animation: gradientBG 15s ease infinite;
-    color: #333;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: 'Arial', sans-serif;
+    background-color: #002147; /* Colore di sfondo blu scuro */
+    color: #ffffff; /* Testo bianco */
+    line-height: 1.6; /* Migliora la leggibilità */
 }
 
 /* Background animation */
@@ -27,68 +22,180 @@ body {
 }
 
 .container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 30px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    border-radius: 15px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
     text-align: center;
-    transition: all 0.3s ease;
-}
-
-.container:hover {
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
-
-h1, h2 {
-    text-align: center;
-    color: #2c3e50;
-    font-size: 2rem;
 }
 
 /* Responsive typography */
+h1, h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    line-height: 1.3;
+}
+
 @media (max-width: 768px) {
     h1, h2 {
-        font-size: 1.5rem;
+        font-size: 2rem;
     }
     .container {
-        padding: 20px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1, h2 {
+        font-size: 1.5rem;
     }
 }
 
 /* Partecipanti */
 .partecipante {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    margin: 15px 0;
-    background-color: rgba(255, 255, 255, 0.8);
+    position: relative;
+    background-color: #f5f5f5;
+    color: #002147;
+    padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    height: 80px;
+    margin: 50px 0;
+    display: flex;
+    align-items: center; /* Allinea gli elementi verticalmente al centro */
+    justify-content: center; /* Mantiene il testo centrato */
+    text-align: center; /* Centro il testo */
 }
 
-.partecipante:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+.name-wrapper {
+    position: relative;
+    flex-grow: 1; /* Occupare tutto lo spazio disponibile */
+    text-align: center; /* Assicura che il testo resti centrato */
 }
 
-button {
-    background-color: #3498db;
-    color: white;
-    padding: 12px 18px;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
+/* Dettagli del partecipante */
+.name {
+    display: flex;
+    font-size: 16px;
+    font-weight: bold;
+    justify-content: center;
+}
+
+.number{
+    margin-left: 5%;
+}
+
+.number,.name  span {
+    display: block;
+}
+
+.number, .name  span:first-child {
+    font-weight: bold;
     font-size: 1rem;
-    transition: all 0.3s ease;
 }
 
+.number, .name  span:last-child {
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.number{
+    position: absolute;
+    font-size: 1.5rem;
+    size: 100px;
+    margin-left: 20px;
+}
+
+.number-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center; /* Allinea gli elementi verticalmente al centro */
+    justify-content: center; /* Mantiene il testo centrato */
+    text-align: center; /* Centers il testo */
+}
+
+/* Immagine posizionata assolutamente a destra */
+.immagine {
+    position: absolute;
+    right: 0px; /* Posiziona l'immagine a destra del contenitore */
+    top: 50%;
+    transform: translateY(-50%); /* Centra verticalmente l'immagine */
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    background-color: #d3d3d3;
+    box-shadow: 5px 5px 15px 5px #000000;
+}
+
+@media (max-width: 768px) {
+    .container {
+        max-width: 90%;
+    }
+    .partecipante {
+        flex-direction: row; /* Mantieni la direzione in riga */
+        justify-content: flex-start; /* Allinea gli elementi a sinistra */
+    }
+    .immagine {
+        margin: 0 0 0 10px; /* Spazio a sinistra dell'immagine */
+        width: 100px;
+        height: 100px;
+    }
+    .number{
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    .partecipante {
+        padding: 10px;
+    }
+    .immagine {
+        display: block;
+        float: right;
+
+        width: 100px;
+        height: 100px;
+        }
+}
+
+/* Bottone di votazione */
+.votaBtn {
+    position: absolute; /* Cambiato da relative ad absolute */
+    left: 50%; /* Centra il bottone orizzontalmente rispetto al partecipante */
+    bottom: -20px; /* Lo posiziona fuori dal box, sotto il partecipante */
+    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
+    margin-top: 0; /* Rimuove il margine superiore */
+    padding: 10px 20px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 150px;
+    text-align: center; /* Centra il testo */
+    display: flex;
+    justify-content: center; /* Assicura che il testo sia centrato orizzontalmente */
+    align-items: center; /* Assicura che il testo sia centrato verticalmente */
+}
+
+.votaBtn:checked {
+    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
+}
+
+/* Hover generico sui bottoni */
+.votaBtn:hover {
+    background-color: rgb(94, 94, 94);
+}
+
+/* Hover generico sui bottoni */
 button:hover {
     background-color: #2980b9;
+    transition: 0.2s;
     transform: scale(1.05);
+    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
+
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
@@ -118,6 +225,7 @@ input:focus {
     box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
 }
 
+/* Lista partecipanti */
 ul {
     list-style-type: none;
     padding: 0;
@@ -140,12 +248,11 @@ li:hover {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Smooth transition for admin panel list */
 #adminPartecipantiList li {
     transition: all 0.5s ease;
 }
 
-/* Animating buttons for removing participants */
+/* Bottone di rimozione partecipanti */
 .rimuoviBtn {
     background-color: #e74c3c;
 }
@@ -156,14 +263,12 @@ li:hover {
     box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
 }
 
-/* Custom message styling */
 #messaggioVotazioni {
     color: #e74c3c;
     font-weight: bold;
     margin-top: 15px;
 }
 
-/* Toggle Voting button */
 #toggleVotazioni {
     background-color: #2ecc71;
     padding: 12px 18px;
@@ -181,38 +286,9 @@ li:hover {
     box-shadow: 0 5px 15px rgba(0, 128, 0, 0.4);
 }
 
-/* Responsive media queries */
-@media (max-width: 768px) {
-    .container {
-        max-width: 95%;
-    }
-    .partecipante {
-        flex-direction: column;
-        gap: 10px;
-    }
-    button {
-        width: 100%;
-        padding: 15px;
-        font-size: 1.2rem;
-    }
-}
-
-@media (max-width: 480px) {
-    h1, h2 {
-        font-size: 1.2rem;
-    }
-    .partecipante {
-        padding: 10px;
-    }
-    button {
-        padding: 10px;
-        font-size: 1rem;
-    }
-}
-
 .già-votato {
-    background-color: gray; /* Colore di sfondo grigio */
-    cursor: not-allowed; /* Cambia il cursore */
-    text-decoration: line-through; /* Aggiunge una linea sopra il testo */
-    opacity: 0.6; /* Riduce l'opacità */
+    background-color: rgb(94, 94, 94);
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 1;
 }

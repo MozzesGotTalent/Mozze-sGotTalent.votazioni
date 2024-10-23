@@ -13,12 +13,27 @@
 </head>
 <body>
     <div class="container">
-        <h1>VOTO DEL PUBBLICO!</h1>
-        <p>ESPRIMI UNA SOLA PREFERENZA</p>
+        <div class="footer-top">
+            <h1>VOTO DEL PUBBLICO!</h1>
+        </div>
+        <div id="voteWarningPopup" class="popup-overlay">
+            <div class="popup-content">
+              <p>⚠️ESPRIMI UNA SOLA PREFERENZA!⚠️</p>
+              <button id="popupOkBtn">Ok</button>
+            </div>
+          </div>
         <div id="messaggioVotazioni" style="color: red; font-weight: bold;"></div>
         <div id="partecipanti" class="partecipanti-list">
             <!-- I partecipanti verranno caricati qui -->
         </div>
+        <footer class="footer">
+            <p>Copyright © 2024 - Mozze's Got Talent</p>
+            <div class="logos">
+                <img src="images/1701871828_NOI_Logo_SanZeno_bianco_arancio.png" alt="NOI Logo">
+                <img src="images/mozze-got-talent_logo.png" alt="Mozze Got Talent Logo">
+                <img src="images/noi-mozzecane.png" alt="Noi Mozzecane Logo">
+            </div>
+        </footer>
     </div>
 </body>
 </html>

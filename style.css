@@ -291,6 +291,8 @@ li:hover {
     cursor: not-allowed;
     text-decoration: line-through;
     opacity: 1;
+    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
+
 }
 
 

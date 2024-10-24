@@ -1,39 +1,69 @@
 <!DOCTYPE html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Votazioni - Mozze's Got Talent</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.8/firebase-storage-compat.js"></script>
 
     <script src="script.js" defer></script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="footer-top">
-            <h1>VOTO DEL PUBBLICO!</h1>
+      <div class="footer-top">
+        <h1>VOTO DEL PUBBLICO!</h1>
+      </div>
+      <div id="voteWarningPopup" class="popup-overlay">
+        <div class="popup-content">
+          <p id="voteWarningText">⚠️ESPRIMI UNA SOLA PREFERENZA!⚠️</p>
+          <button id="popupOkBtn">Ok</button>
         </div>
-        <div id="voteWarningPopup" class="popup-overlay">
-            <div class="popup-content">
-              <p>⚠️ESPRIMI UNA SOLA PREFERENZA!⚠️</p>
-              <button id="popupOkBtn">Ok</button>
-            </div>
+      </div>
+      <div class="container-messageVotazioni" id="idcontainer-messageVotazioni">
+        <div id="messaggioVotazioniInstagram">
+          <div id="messaggioVotazioni" style="color: red; font-weight: bold">
+            VOTAZIONI AL MOMENTO CHIUSE
           </div>
-        <div id="messaggioVotazioni" style="color: red; font-weight: bold;"></div>
-        <div id="partecipanti" class="partecipanti-list">
-            <!-- I partecipanti verranno caricati qui -->
+          <div id="messaggioVotazioni" style="color: black">
+            Seguici sui nostri social!
+          </div>
+          <a
+            href="https://www.instagram.com/parrocchia.mozze?igsh=MTNrMzZpZ2Vmemtpbw=="
+          >
+            <img class="immagineInstagram"" src="instagram.svg" alt="" /></a
+          >
+          <a
+            href="https://www.facebook.com/share/k7ncNkCtWQ4qphrU/?mibextid=LQQJ4d"
+          >
+            <img class="immagineInstagram" src="facebook.svg" alt=""
+          /></a>
+          <a
+            href="https://www.tiktok.com/@noisanzenoinmozzoaps?_t=8qoYqVdn5jK&_r=1"
+          >
+            <img class="immagineInstagram" src="tiktok.svg" alt=""
+          /></a>
         </div>
-        <footer class="footer">
-            <p>Copyright © 2024 - Mozze's Got Talent</p>
-            <div class="logos">
-                <img src="images/1701871828_NOI_Logo_SanZeno_bianco_arancio.png" alt="NOI Logo">
-                <img src="images/mozze-got-talent_logo.png" alt="Mozze Got Talent Logo">
-                <img src="images/noi-mozzecane.png" alt="Noi Mozzecane Logo">
-            </div>
-        </footer>
+      </div>
+      <div id="partecipanti" class="partecipanti-list">
+        <!-- I partecipanti verranno caricati qui -->
+      </div>
+      <footer class="footer">
+        <p>Copyright © 2024 - Mozze's Got Talent</p>
+        <div class="logos">
+          <img
+            src="images/1701871828_NOI_Logo_SanZeno_bianco_arancio.png"
+            alt="NOI Logo"
+          />
+          <img
+            src="images/mozze-got-talent_logo.png"
+            alt="Mozze Got Talent Logo"
+          />
+          <img src="images/noi-mozzecane.png" alt="Noi Mozzecane Logo" />
+        </div>
+      </footer>
     </div>
-</body>
+  </body>
 </html>

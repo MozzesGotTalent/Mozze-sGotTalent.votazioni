@@ -11,23 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
     appId: "1:418567627270:web:6d4e6d51893539c101d987",
   };
 
-// Controlla se sei nella pagina index.html o nella root (tipico su GitHub Pages)
-const currentPage = window.location.pathname;
-if (currentPage.includes("index.html") || currentPage === "/" || currentPage === "/Mozze-sGotTalent.votazioni/") {
-  // Mostra il popup solo se sei su index.html o nella root del sito
-  const popup = document.getElementById("voteWarningPopup");
-  const okButton = document.getElementById("popupOkBtn");
-
-  // Rendi visibile il popup
-  popup.style.display = "flex";
-
-  // Nascondi il popup quando viene cliccato il pulsante "Ok"
-  okButton.addEventListener("click", function () {
-    popup.style.display = "none";
-    // Continua con il resto della logica solo dopo la chiusura del popup
-  });
-}
-
   // Initialize Firebase
   if (typeof firebase === "undefined") {
     console.error("Firebase is not loaded. Please check your script includes.");
@@ -44,7 +27,26 @@ if (currentPage.includes("index.html") || currentPage === "/" || currentPage ===
   const toggleVotazioniBtn = document.getElementById("toggleVotazioni");
   const partecipantiList = document.getElementById("partecipanti");
   const messaggioVotazioni = document.getElementById("messaggioVotazioni");
+  const messaggioVotazioniInstagram = document.getElementById(
+    "idcontainer-messageVotazioni"
+  );
+  const popup = document.getElementById("voteWarningPopup");
+  const okButton = document.getElementById("popupOkBtn");
 
+
+  const currentPage = window.location.pathname;
+  if (
+    currentPage.includes("index.html") ||
+    currentPage === "/" ||
+    currentPage === "/Mozze-sGotTalent.votazioni/"
+  ) {
+
+    // Nascondi il popup quando viene cliccato il pulsante "Ok"
+    okButton.addEventListener("click", function () {
+      popup.style.display = "none";
+      // Continua con il resto della logica solo dopo la chiusura del popup
+    });
+  }
   // Ensure all elements are found
   const elements = [
     { name: "adminPartecipantiList", element: adminPartecipantiList },
@@ -80,11 +82,15 @@ if (currentPage.includes("index.html") || currentPage === "/" || currentPage ===
     db.ref("statoVotazioni").on("value", (snapshot) => {
       const stato = snapshot.val();
 
-      if (!stato) {
+      if (stato === false) {
         partecipantiList.innerHTML = "";
-        messaggioVotazioni.textContent = "Votazioni chiuse, aspettare.";
-      } else {
+        messaggioVotazioni.textContent = "Votazioni CHIUSE al momento";
+        messaggioVotazioniInstagram.style.display = "flex";
+        popup.style.display = "none";
+      } else if (stato === true) {
         messaggioVotazioni.textContent = "";
+        messaggioVotazioniInstagram.style.display = "none";
+        popup.style.display = "flex";
         db.ref("partecipanti").on("value", (snapshot) => {
           let partecipanti = snapshot.val();
           partecipantiList.innerHTML = "";
@@ -98,19 +104,19 @@ if (currentPage.includes("index.html") || currentPage === "/" || currentPage ===
               })
             );
 
-            // Ordina i partecipanti per numero della performance
-            partecipanti.sort(
-              (a, b) => a.performanceNumber - b.performanceNumber
-            );
+            if (stato === true) {
+              partecipanti.sort(
+                (a, b) => a.performanceNumber - b.performanceNumber
+              );
 
-            // Aggiungi i partecipanti al DOM
-            partecipanti.forEach((partecipante) => {
-              const numeroEsibizione = partecipante.performanceNumber
-                .toString()
-                .padStart(2, "0"); // Aggiungi lo zero se il numero è a una cifra
-              const div = document.createElement("div");
-              div.className = "partecipante";
-              div.innerHTML = `
+              // Aggiungi i partecipanti al DOM
+              partecipanti.forEach((partecipante) => {
+                const numeroEsibizione = partecipante.performanceNumber
+                  .toString()
+                  .padStart(2, "0");
+                const div = document.createElement("div");
+                div.className = "partecipante";
+                div.innerHTML = `
               <img class="immagine" src="${partecipante.immagineUrl}" alt="${partecipante.nome}" width="100" />
               <div class="number-wrapper">
               <div class="number">${numeroEsibizione}</div>
@@ -121,8 +127,9 @@ if (currentPage.includes("index.html") || currentPage === "/" || currentPage ===
 
               <button class="votaBtn" data-id="${partecipante.id}">Vota</button>
             `;
-              partecipantiList.appendChild(div);
-            });
+                partecipantiList.appendChild(div);
+              });
+            }
 
             // Aggiungi event listeners per i pulsanti di voto
             document.querySelectorAll(".votaBtn").forEach((button) => {
@@ -130,6 +137,7 @@ if (currentPage.includes("index.html") || currentPage === "/" || currentPage ===
 
               // Disabilita il pulsante se l'utente ha già votato
               if (localStorage.getItem("votato")) {
+                popup.style.display = "none";
                 button.classList.add("già-votato");
                 button.disabled = true; // Disabilita il pulsante
               }

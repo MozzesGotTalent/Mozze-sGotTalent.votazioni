@@ -1,9 +1,9 @@
-/* Sfondo animato */
+/* Sfondo animato simile a quello dell'Eurovision */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #141e30, #243b55, #415a77);
+    background: linear-gradient(135deg, #1e3a6a, #243b55, #2d6b8c);
     background-size: 200% 200%;
     animation: bgAnimation 15s ease infinite;
     color: #fff;
@@ -16,30 +16,42 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* Contenitore classifica */
+/* Contenitore classifica stile Eurovision */
 .classifica-container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 50px auto;
     text-align: center;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
 }
 
-/* Foto partecipante con effetto di animazione */
+/* Lista dei partecipanti in ordine inverso */
+.classifica-container ul {
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 0;
+    margin: 0;
+}
+
+/* Partecipante stile Eurovision */
 .partecipante {
     margin: 20px 0;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
     opacity: 0;
-    transform: translateX(-100%);
+    transform: translateX(-120%);
     animation: slideIn 1.5s ease forwards;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    position: relative;
+    border: 2px solid transparent;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .partecipante:nth-child(even) {
@@ -50,6 +62,17 @@ body {
     animation-delay: 1s;
 }
 
+/* Posizione in classifica (grande numero a sinistra) */
+.partecipante::before {
+    content: attr(data-pos); /* Usa l'attributo data-pos per la posizione */
+    font-size: 2.5rem;
+    color: #f9c74f;
+    position: absolute;
+    left: -100px;
+    top: 50%;
+    transform: translateY(0);
+}
+
 /* Animazione slide-in */
 @keyframes slideIn {
     to {
@@ -58,7 +81,7 @@ body {
     }
 }
 
-/* Stile foto dei partecipanti */
+/* Foto partecipante */
 .foto-partecipante {
     width: 80px;
     height: 80px;
@@ -73,14 +96,38 @@ body {
     transform: scale(1.1);
 }
 
-/* Nome partecipante e voti */
+/* Dettagli del partecipante */
 .dettagli-partecipante {
+    flex-grow: 1;
     font-size: 1.5rem;
     text-align: left;
+    color: #fff;
 }
 
-.dettagli-partecipante span {
-    display: block;
-    font-size: 1.2rem;
+/* Nome del partecipante */
+.dettagli-partecipante strong {
+    font-size: 1.8rem;
     color: #f9c74f;
+}
+
+/* Voti del partecipante */
+.dettagli-partecipante span {
+    font-size: 1.2rem;
+    color: #ffffff;
+}
+
+/* Voti a destra */
+.voti {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #f9c74f;
+    text-align: right;
+    min-width: 100px;
+}
+
+/* Evidenziazione del partecipante attivo */
+.partecipante-active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid #f9c74f;
+    box-shadow: 0 10px 30px rgba(249, 199, 79, 0.5);
 }

@@ -309,37 +309,47 @@ document.addEventListener("DOMContentLoaded", function () {
       .ref("partecipanti")
       .once("value", (snapshot) => {
         const partecipanti = [];
+        let totaleVoti = 0; // Variabile per il totale dei voti
+  
         snapshot.forEach((childSnapshot) => {
           const partecipante = childSnapshot.val();
-          console.log(`Foto URL: ${partecipante.immagineUrl}`);
+          const voti = partecipante.voti || 0;
+          totaleVoti += voti; // Somma i voti totali
+  
           partecipanti.push({
             nome: partecipante.nome,
-            voti: partecipante.voti || 0,
+            voti: voti,
             foto: partecipante.immagineUrl || "user.jpg",
           });
         });
-
-        // Ordina i partecipanti in base ai voti (dal meno al più votato)
+  
+        // Calcola la percentuale e ordina i partecipanti in base ai voti (dal meno al più votato)
+        partecipanti.forEach((partecipante) => {
+          partecipante.percentuale = totaleVoti
+            ? Math.round((partecipante.voti / totaleVoti) * 100) // Calcola la percentuale
+            : 0; // Evita divisioni per zero
+        });
+  
         partecipanti.sort((a, b) => a.voti - b.voti);
-
+  
         // Crea la pagina della classifica senza mostrarla ancora
         let classificaHtml = `
           <h1>Classifica Finale</h1>
           <div class="classifica-container">
               <ul>`;
-
+  
         partecipanti.forEach((partecipante) => {
           classificaHtml += `
             <li class="partecipante" style="display: none;"> <!-- Inizialmente invisibile -->
                 <img src="${partecipante.foto}" alt="${partecipante.nome}" class="foto-partecipante">
                 <div class="dettagli-partecipante">
                     <strong>${partecipante.nome}</strong>
-                    <span>${partecipante.voti} voti</span>
+                    <span>${partecipante.percentuale}% dei voti</span> <!-- Mostra la percentuale -->
                 </div>
             </li>`;
         });
         classificaHtml += "</ul></div>";
-
+  
         // Mostra la classifica nella nuova pagina
         const classificaPage = window.open("", "_blank");
         classificaPage.document.write(`
@@ -359,33 +369,33 @@ document.addEventListener("DOMContentLoaded", function () {
           <body>${classificaHtml}</body>
           </html>
         `);
-
+  
         // Inizializza l'indice del partecipante corrente
         let currentIndex = 0;
-
+  
         // Funzione per mostrare il partecipante successivo
         function mostraProssimoPartecipante() {
           const partecipantiList =
             classificaPage.document.querySelectorAll(".partecipante");
-
+  
           // Se ci sono partecipanti da mostrare
           if (currentIndex < partecipantiList.length) {
             // Mostra solo il partecipante corrente
             partecipantiList[currentIndex].style.display = "block"; // Assicurati che sia visibile
             partecipantiList[currentIndex].style.opacity = 1; // Imposta l'opacità a 1
-
+  
             // Incrementa l'indice per il prossimo partecipante
             currentIndex++;
           }
         }
-
+  
         // Aggiungi l'event listener per l'animazione
         classificaPage.addEventListener("keydown", (event) => {
           if (event.key === "Enter") {
             mostraProssimoPartecipante(); // Mostra il partecipante successivo
           }
         });
-
+  
         // Imposta il focus sulla pagina per ricevere l'input
         classificaPage.focus();
       });

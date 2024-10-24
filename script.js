@@ -11,21 +11,22 @@ document.addEventListener("DOMContentLoaded", function () {
     appId: "1:418567627270:web:6d4e6d51893539c101d987",
   };
 
-  const currentPage = window.location.pathname;
-  if (currentPage.includes("index.html") || currentPage === "/") {
-    // Show the popup only if you are in index.html
-    const popup = document.getElementById("voteWarningPopup");
-    const okButton = document.getElementById("popupOkBtn");
+// Controlla se sei nella pagina index.html o nella root (tipico su GitHub Pages)
+const currentPage = window.location.pathname;
+if (currentPage.includes("index.html") || currentPage === "/" || currentPage === "/Mozze-sGotTalent.votazioni/") {
+  // Mostra il popup solo se sei su index.html o nella root del sito
+  const popup = document.getElementById("voteWarningPopup");
+  const okButton = document.getElementById("popupOkBtn");
 
-    // Make the popup visible
-    popup.style.display = "flex";
+  // Rendi visibile il popup
+  popup.style.display = "flex";
 
-    // Hide the popup when the "Ok" button is clicked
-    okButton.addEventListener("click", function () {
-      popup.style.display = "none";
-      // Continua con il resto della logica solo dopo la chiusura del popup
-    });
-  }
+  // Nascondi il popup quando viene cliccato il pulsante "Ok"
+  okButton.addEventListener("click", function () {
+    popup.style.display = "none";
+    // Continua con il resto della logica solo dopo la chiusura del popup
+  });
+}
 
   // Initialize Firebase
   if (typeof firebase === "undefined") {

@@ -188,6 +188,7 @@ h1, h2 {
 /* Hover generico sui bottoni */
 .votaBtn:hover {
     background-color: rgb(94, 94, 94);
+    transform: translateX(-50%); /* Compensa lo spostamento per mantenere il centro */
 }
 
 /* Hover generico sui bottoni */
@@ -195,7 +196,6 @@ button:hover {
     background-color: #2980b9;
     transition: 0.2s;
     transform: scale(1.05);
-
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 

@@ -343,7 +343,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <li class="partecipante" style="display: none;"> <!-- Inizialmente invisibile -->
                 <img src="${partecipante.foto}" alt="${partecipante.nome}" class="foto-partecipante">
                 <div class="dettagli-partecipante">
-                    <strong>${partecipante.nome}</strong>
+                    <strong>${partecipante.nome}</strong></br>
                     <span>${partecipante.percentuale}% dei voti</span> <!-- Mostra la percentuale -->
                 </div>
             </li>`;

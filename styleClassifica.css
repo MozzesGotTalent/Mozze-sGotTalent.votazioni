@@ -38,6 +38,7 @@ body {
 
 /* Partecipante stile Eurovision */
 .partecipante {
+    background-image: url('Untitled-1.png');
     margin: 20px 0;
     padding: 15px;
     display: flex;
@@ -100,7 +101,7 @@ body {
 .dettagli-partecipante {
     flex-grow: 1;
     font-size: 1.5rem;
-    text-align: left;
+    text-align: center;
     color: #fff;
 }
 

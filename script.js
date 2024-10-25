@@ -33,14 +33,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const popup = document.getElementById("voteWarningPopup");
   const okButton = document.getElementById("popupOkBtn");
 
-
   const currentPage = window.location.pathname;
   if (
     currentPage.includes("index.html") ||
     currentPage === "/" ||
     currentPage === "/Mozze-sGotTalent.votazioni/"
   ) {
-
     // Nascondi il popup quando viene cliccato il pulsante "Ok"
     okButton.addEventListener("click", function () {
       popup.style.display = "none";
@@ -309,97 +307,152 @@ document.addEventListener("DOMContentLoaded", function () {
       .ref("partecipanti")
       .once("value", (snapshot) => {
         const partecipanti = [];
-        let totaleVoti = 0; // Variabile per il totale dei voti
-  
+        let totaleVoti = 0;
+
         snapshot.forEach((childSnapshot) => {
           const partecipante = childSnapshot.val();
           const voti = partecipante.voti || 0;
-          totaleVoti += voti; // Somma i voti totali
-  
+          totaleVoti += voti;
+
           partecipanti.push({
             nome: partecipante.nome,
             voti: voti,
             foto: partecipante.immagineUrl || "user.jpg",
           });
         });
-  
-        // Calcola la percentuale e ordina i partecipanti in base ai voti (dal meno al più votato)
+
         partecipanti.forEach((partecipante) => {
           partecipante.percentuale = totaleVoti
-            ? Math.round((partecipante.voti / totaleVoti) * 100) // Calcola la percentuale
-            : 0; // Evita divisioni per zero
+            ? Math.round((partecipante.voti / totaleVoti) * 100)
+            : 0;
         });
-  
-        partecipanti.sort((a, b) => a.voti - b.voti);
-  
-        // Crea la pagina della classifica senza mostrarla ancora
+
+        partecipanti.sort((a, b) => a.voti - b.voti); // Ordinamento dal meno al più votato
+
         let classificaHtml = `
-          <h1>Classifica Finale</h1>
-          <div class="classifica-container">
-              <ul>`;
-  
-        partecipanti.forEach((partecipante) => {
+                <h1 style="text-align: center;">Classifica Finale</h1>
+                <div class="classifica-container">
+                    <ul>`;
+
+        partecipanti.forEach((partecipante, index) => {
+          const posizione = partecipanti.length - index;
+
           classificaHtml += `
-            <li class="partecipante" style="display: none;"> <!-- Inizialmente invisibile -->
-                <img src="${partecipante.foto}" alt="${partecipante.nome}" class="foto-partecipante">
-                <div class="dettagli-partecipante">
-                    <strong>${partecipante.nome}</strong></br>
-                    <span>${partecipante.percentuale}% dei voti</span> <!-- Mostra la percentuale -->
-                </div>
-            </li>`;
+                    <li class="partecipante" style="display: none;">
+                        <img src="${partecipante.foto}" alt="${partecipante.nome}" class="foto-partecipante">
+                        <div class="dettagli-partecipante">
+                            <strong>${partecipante.nome}</strong><br>
+                            <span>${partecipante.percentuale}%</span>
+                        </div>
+                        <div class="container-posto">
+                          <div class="numero-posto">${posizione}°</div>
+                        </div>
+                    </li>`;
         });
+
         classificaHtml += "</ul></div>";
-  
-        // Mostra la classifica nella nuova pagina
+
         const classificaPage = window.open("", "_blank");
         classificaPage.document.write(`
-          <!DOCTYPE html>
-          <html lang="it">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Classifica Finale</title>
-              <link rel="stylesheet" href="styleClassifica.css">
-              <style>
-                  .partecipante {
-                      transition: opacity 0.5s ease; /* Transizione per l'animazione */
-                  }
-              </style>
-          </head>
-          <body>${classificaHtml}</body>
-          </html>
-        `);
-  
-        // Inizializza l'indice del partecipante corrente
+                <!DOCTYPE html>
+                <html lang="it">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Classifica Finale</title>
+                    <link rel="stylesheet" href="styleClassifica.css">
+                    <style>
+                        .partecipante {
+                            transition: opacity 0.5s ease;
+                        }
+                        /* Container per i coriandoli */
+                        .confetti {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            pointer-events: none;
+                            overflow: hidden;
+                            z-index: -1;
+                        }
+
+                        /* Singolo coriandolo */
+                        .confetti-piece {
+                            position: absolute;
+                            width: 10px;
+                            height: 10px;
+                            opacity: 0.8;
+                            border-radius: 50%;
+                            animation: caduta-confetti linear infinite;
+                            animation-duration: calc(2s + 3 * var(--random)) !important;
+                        }
+
+                        /* Animazione dei coriandoli */
+                        @keyframes caduta-confetti {
+                            0% {
+                                transform: translateY(0) rotate(0);
+                                opacity: 1;
+                            }
+                            100% {
+                                transform: translateY(100vh) rotate(360deg);
+                                opacity: 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                ${classificaHtml}
+                <div class="confetti"></div>
+                <script>
+                    // Genera i coriandoli
+                    function creaCoriandoli() {
+                        const confettiContainer = document.querySelector(".confetti");
+                        for (let i = 0; i < 100; i++) {
+                            const confetto = document.createElement("div");
+                            confetto.classList.add("confetti-piece");
+                            confetto.style.left = \`\${Math.random() * 100}vw\`;
+                            confetto.style.top = \`\${-10 + Math.random() * 5}vh\`;
+                            confetto.style.backgroundColor = generaColoreCasuale();
+                            confettiContainer.appendChild(confetto);
+                        }
+                    }
+
+                    // Genera un colore casuale per i coriandoli
+                    function generaColoreCasuale() {
+                        const colori = ["#FF5733", "#FFC300", "#DAF7A6", "#FF33FF", "#33FFF9"];
+                        return colori[Math.floor(Math.random() * colori.length)];
+                    }
+
+                    // Esegui la creazione dei coriandoli al caricamento della pagina
+                    window.onload = creaCoriandoli;
+                </script>
+                </body>
+                </html>
+            `);
+
         let currentIndex = 0;
-  
-        // Funzione per mostrare il partecipante successivo
+
         function mostraProssimoPartecipante() {
           const partecipantiList =
             classificaPage.document.querySelectorAll(".partecipante");
-  
-          // Se ci sono partecipanti da mostrare
+
           if (currentIndex < partecipantiList.length) {
-            // Mostra solo il partecipante corrente
-            partecipantiList[currentIndex].style.display = "block"; // Assicurati che sia visibile
-            partecipantiList[currentIndex].style.opacity = 1; // Imposta l'opacità a 1
-  
-            // Incrementa l'indice per il prossimo partecipante
+            partecipantiList[currentIndex].style.display = "block";
+            partecipantiList[currentIndex].style.opacity = 1;
             currentIndex++;
           }
         }
-  
-        // Aggiungi l'event listener per l'animazione
+
         classificaPage.addEventListener("keydown", (event) => {
           if (event.key === "Enter") {
-            mostraProssimoPartecipante(); // Mostra il partecipante successivo
+            mostraProssimoPartecipante();
           }
         });
-  
-        // Imposta il focus sulla pagina per ricevere l'input
+
         classificaPage.focus();
       });
-  }
+}
   // Evento per il bottone della classifica
   document
     .getElementById("showRanking")
